@@ -1,0 +1,61 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "hash": "96560ca0e322723114dff1ae6aaf148b",
+    "content-hash": "5334bd53d7fcdf6f1fc643bf602d2328",
+    "packages": [
+        {
+            "name": "j7tools/j7debug",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/joselee214/j7tools.git",
+                "reference": "4ce295764e17d2d210eefb2fd8a45e6a50c6ce1c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://files.phpcomposer.com/files/joselee214/j7tools/4ce295764e17d2d210eefb2fd8a45e6a50c6ce1c.zip",
+                "reference": "4ce295764e17d2d210eefb2fd8a45e6a50c6ce1c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "composer",
+            "autoload": {
+                "psr-4": {
+                    "j7tools\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Jose",
+                    "email": "jose@7yes.com",
+                    "role": "Founder and project lead"
+                }
+            ],
+            "description": "调试工具 by Jose : 通过浏览器插件 firePHP/chromeLogger ,把php代码的调试信息输出在 console , 通过header头传递数据,不会中断 response , 适合调试 ajax 等过程 , 说明看代码里的 README.md",
+            "keywords": [
+                "j7debug",
+                "j7tools"
+            ],
+            "time": "2017-08-04 16:54:33"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "j7tools/j7debug": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.0"
+    },
+    "platform-dev": []
+}

@@ -1,0 +1,53 @@
+a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,dialog,div,dl,dt,em,embed,fieldset,figcaption,figure,font,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,hr,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,meter,nav,object,ol,output,p,pre,progress,q,rp,rt,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video,xmp { border: 0; margin: 0; padding: 0; }
+html,body { height: 100%;}
+input,select,textarea {margin:0;padding:0;resize: none;}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section {display: block; }
+b,strong { font-weight: bold; }
+img { font-size: 0; vertical-align: middle;  -ms-interpolation-mode: bicubic; }
+table { border-collapse: collapse; border-spacing: 0; }
+th,td,caption { font-weight: normal; vertical-align: top; text-align: left; }
+svg { overflow: hidden;}
+body { font: 13px/18px Arial, Tahoma, Verdana,"宋体";color: #333;background-color:#fff;-webkit-text-size-adjust:none;}
+input,textarea,select {font-family: Arial,Tahoma,Verdana , "宋体";}
+hr { border: 0; border-top-width: 1px; clear: both; height: 0; }
+:focus {outline: none;}
+a {cursor:pointer;text-decoration:none;display: inline-block;}
+a:link,a:visited {color: #333;}
+a:hover {text-decoration:underline;color:#c00 !important;}
+/*a:visited {color:#551A8B;}*/
+h1 { font-size: 25px; }
+h2 { font-size: 23px; }
+h3 { font-size: 21px; }
+h4 { font-size: 19px; }
+h5 { font-size: 17px; }
+h6 { font-size: 15px; }
+ol { list-style: decimal; }
+ul { list-style: none; margin:0;z-index:1;}
+li { margin:0;display: list-item;vertical-align:bottom;}
+address,caption,cite,code,dfn,th,var{font-style:normal;font-weight:normal;}
+
+input[type=checkbox],input[type=radio],input[type=button],input[type=submit],select,input.button,input.checkbox,input.radio {cursor:pointer;}
+
+.clear { clear: both; display: block; overflow: hidden; visibility: hidden; width: 0; height: 0; }
+.clearfix:before, .clearfix:after { content: '\0020'; display: block; overflow: hidden; visibility: hidden; width: 0; height: 0; }
+.clearfix:after { clear: both; }
+.clearfix {zoom: 1;}
+.center {margin:0 auto;}
+.fleft{ float:left; display:inline;}
+.fright{float:right; display:inline;}
+.fnormal{float:none; display:inline;}
+.tc{text-align: center;}
+.tl{text-align: left;}
+.tr{text-align: right;}
+
+
+.hidden{display: none;}
+
+.red,a.red{color:red;}
+.green,a.green{color: green;}
+.blue,a.blue{color: blue;}
+.c6,a.c6{color: #666666;}
+.c9,a.c9{color: #999999;}
+.cf3,a.cf3{color: #f3f3f3;}
+
+[v-cloak]{display:none;}

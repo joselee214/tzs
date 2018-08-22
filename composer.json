@@ -1,0 +1,10 @@
+{
+  "name": "upjiaju",
+  "homepage": "http://www.upjiaju.com/",
+  "type": "project",
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=7.0",
+    "j7tools/j7debug": "dev-master"
+  }
+}

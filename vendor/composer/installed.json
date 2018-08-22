@@ -1,0 +1,42 @@
+[
+    {
+        "name": "j7tools/j7debug",
+        "version": "dev-master",
+        "version_normalized": "9999999-dev",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/joselee214/j7tools.git",
+            "reference": "4ce295764e17d2d210eefb2fd8a45e6a50c6ce1c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://files.phpcomposer.com/files/joselee214/j7tools/4ce295764e17d2d210eefb2fd8a45e6a50c6ce1c.zip",
+            "reference": "4ce295764e17d2d210eefb2fd8a45e6a50c6ce1c",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.6.0"
+        },
+        "time": "2017-08-04 16:54:33",
+        "type": "composer",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "j7tools\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "authors": [
+            {
+                "name": "Jose",
+                "email": "jose@7yes.com",
+                "role": "Founder and project lead"
+            }
+        ],
+        "description": "调试工具 by Jose : 通过浏览器插件 firePHP/chromeLogger ,把php代码的调试信息输出在 console , 通过header头传递数据,不会中断 response , 适合调试 ajax 等过程 , 说明看代码里的 README.md",
+        "keywords": [
+            "j7debug",
+            "j7tools"
+        ]
+    }
+]

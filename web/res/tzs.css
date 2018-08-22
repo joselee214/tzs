@@ -1,0 +1,136 @@
+body{
+    width: 100%;
+    color: rgb(51, 51, 51);
+    background-color: rgb(255, 255, 255);
+    text-size-adjust: none;
+    font: normal 100% Arial, Tahoma, Verdana, 宋体;
+    background: #f3f3f3;
+}
+
+input{
+    display:block;
+    text-overflow:clip;
+    overflow:hidden;
+    white-space:nowrap;
+    min-height:1.4rem;
+    height:1.4rem;
+    padding: 0 5px;
+    border: 1px solid #bbbbbb;
+}
+textarea {
+    line-height: 1rem;
+    height: 200px;
+    padding: 4px;
+    border: 1px solid #bbbbbb;
+    -webkit-appearance: none;
+    appearance: none;
+    box-shadow:0 0 0 #ffffff;
+    border-image: none;
+    cursor: text;
+    display:block;
+    position:relative;
+    background-color: white;
+    -webkit-rtl-ordering: logical;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.a{
+    cursor: pointer;
+}
+
+.smallavatar{
+    width: 20px;
+    height: 20px;
+}
+
+button{
+    width: 100%;
+    display: block;
+}
+
+input::-webkit-input-placeholder,textarea::-webkit-input-placeholder{
+    color: #dddddd;
+}
+input::-moz-placeholder,textarea::-moz-placeholder{   /* Mozilla Firefox 19+ */
+    color: #dddddd;
+}
+input:-moz-placeholder,textarea:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+    color: #dddddd;
+}
+input:-ms-input-placeholder,textarea:-ms-input-placeholder{  /* Internet Explorer 10-11 */
+    color: #dddddd;
+}
+
+.page-main{
+    max-width: 420px;
+    margin: 0 auto;
+    background: #ffffff;
+    min-height: 100%;
+}
+
+.page-main-placeholder{
+    min-height: 62px;
+}
+
+.reset_cell{
+    display: block;
+}
+
+.backgroundimg{
+    background-repeat:no-repeat;background-position: center center;background-size: contain;
+}
+
+.page-head{
+    max-width: 420px;
+    margin: 0 auto;
+
+    position: fixed;
+    z-index: 999;
+    width: 100%;
+    top: 0;
+    height: 60px;
+    border-bottom: 1px solid #999999;
+    background: #f9f9f9;
+    display: flex;
+    justify-content: space-around;
+}
+
+.nav-tabBar{
+    width: 50%;
+    font-size: 0.6em;
+    padding-top: 5px;
+}
+
+.nav-tabBar img{
+    height:60%;
+    vertical-align: middle;
+}
+
+.page_div,.page_div a{
+    font-size: 80%;
+}
+
+
+.j7small_maskbox{
+    position:fixed;
+    display: flex;
+    left: 0;
+    top:0;
+    width:100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    content: attr(data-text);
+    transition:all 1s ease;
+    color: #FFF;
+    z-index: 1001;
+    justify-content: center;
+    align-items: center;
+}
+.j7small_maskbox img{
+    max-width: 75%;
+}
+.j7small_maskbox div{
+    text-align: center;display: inline-block;
+    min-width: 70%;
+    padding-bottom: 10px;
+}

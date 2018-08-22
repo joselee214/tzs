@@ -1,0 +1,233 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+@import '/zanui/col.wxss';
+@import '/zanui/row.wxss';
+
+.zan-loadmore--nodata{
+  margin: 120px auto;
+}
+.zan-panel {
+margin-top:0;
+}
+.zan-icon {
+  font-size: 18px;
+}
+.zan-card{
+  padding: 15px 20px;
+}
+.doc_content_area{
+  margin-right: 0px;
+}
+.zan-card__thumb{
+  width: 72px;
+}
+.zan-card__detail{
+  margin-left: 85px;
+  margin-right: 25px;
+}
+.doc_mark_row .zan-icon{
+  font-size: 14px;
+}
+.doc_mark{
+  margin:0 36px 0 4px;
+}
+.zan-card__right-col{
+  margin-top:40px;
+}
+.avatar{
+  width: 16px;
+  height: 16px;
+}
+.nickname{
+  font-size: 15px;
+  margin-left: 24px;
+}
+</style>
+
+<template>
+<view class="container">
+
+  <view class="zan-panel">
+
+    <repeat for="{{mydoclist}}" item="item" key="ind" index="ind">
+      <view class="zan-card" wx:if="{{item}}" @tap="_go_url('/pages/d?id={{item.id}}','navigate')">
+        <view class="zan-card__thumb">
+          <image class="zan-card__img" src="{{item.logo}}" mode="aspectFit" />
+        </view>
+        <view class="zan-card__right-col">
+          <view class="zan-icon zan-icon-arrow" style="color: #4b0;"></view>
+        </view>
+        <view class="zan-card__detail">
+          <view class="zan-card__detail-row" wx:if="{{item.nickname}}">
+            <image class="zan-card__img avatar" src="{{item.avatar}}" mode="aspectFit" />
+            <text class="nickname">{{item.nickname}}</text>
+          </view>
+          <view class="zan-card__detail-row" wx:if="{{item.title}}">
+            <view class="zan-card__left-col zan-ellipsis--l2 doc_content_area">
+               {{item.title}}
+            </view>
+          </view>
+          <view class="zan-card__detail-row">
+            <view class="zan-card__left-col zan-c-gray">{{item.created_at}}</view>
+          </view>
+
+          <view class="zan-card__detail-row zan-c-gray-darker">
+            <view class="zan-card__left-col zan-ellipsis--l3 doc_content_area">
+              {{item.content}}
+            </view>
+          </view>
+
+          <view class="zan-card__detail-row doc_mark_row">
+            <view class="zan-icon zan-icon-contact"  style="color: #4b0;"></view>
+            <text class="zan-c-gray doc_mark">{{item.viewtimes}}</text>
+            <view class="zan-icon zan-icon-chat"  style="color: #4b0;" wx:if="{{item.allowReply==1}}"></view>
+            <text class="zan-c-gray-dark doc_mark" wx:if="{{item.allowReply==1}}">{{item.replytimes}}</text>
+          </view>
+
+        </view>
+      </view>
+    </repeat>
+
+
+    <view wx:if="{{userInfoAuthed}}">
+      <zanLoadmore1 :loading.sync="showLoadMore" > </zanLoadmore1>
+      <zanLoadmore2 :nodata.sync="showEmptyData" nodata_str="没有文档"></zanLoadmore2>
+    </view>
+
+  </view>
+
+  <view class="zan-panel" wx:if="{{!userInfoAuthed}}" style="padding:100px 10px 0;">
+    <button open-type="getUserInfo" class="zan-btn zan-btn--primary" bindgetuserinfo="bindgetuserinfo" wx:if="{{!userInfoAuthed}}">
+        需要授权基本信息才能阅览
+      </button>
+  </view>
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+import tip from '../libs/tip'
+import zanLoadmore from '../components/zan-loadmore'
+
+export default class pagesdocs extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '已阅文档'
+  }
+  components = {
+    zanLoadmore1: zanLoadmore,
+    zanLoadmore2: zanLoadmore
+  }
+  data = {
+    userInfoAuthed : true,
+    mydoclist:[],
+    showLoadMore:false,
+    showEmptyData:true,
+    myTotalDocNum:0,
+    preventRepeatReuqest: false,
+    currentPage: 1,
+    page_total: 0,
+    firstload:true
+  }
+  methods = {
+    bindgetuserinfo(e){
+      if( e.detail.userInfo!=undefined && e.detail.userInfo.nickName!=undefined ) {
+        this.uploadUserInfo(e.detail)
+      }
+    }
+  }
+  
+  onLoad() {}
+  onShow() {
+    var s = wepy.getStorageSync('TEMP_DOC_SET')
+    if( s && s=='view' ){
+      this.getMyDocs(1)
+    }
+    wepy.removeStorageSync('TEMP_DOC_SET')
+  }
+
+  async uploadUserInfo(detail) {
+    let that = this
+    wepy.$instance.updateUserInfo(detail).then(resp=>{
+        var rlt = resp.data
+        console.log('uploadUserInfo',rlt)
+        if( rlt.reguid!=undefined && parseInt(rlt.reguid)>0 ){
+          that.userInfoAuthed = true
+          that.$apply()
+          that.getMyDocs(1)
+        }
+    })
+  }
+
+  getMyDocs(currentPage){
+    if( this.userInfoAuthed )
+    {
+      this.showLoadMore = true
+      this.$apply()
+      let that = this
+      currentPage = currentPage || 1
+      api.getMyReadDocs({query:{page:currentPage}}).then(res=>{
+        console.log('getMyReadDocs',res)
+        if(currentPage==1) {
+          that.mydoclist = []
+        }
+        that.mydoclist.push(...res.data.docs.items)
+        that.showLoadMore = false
+        if( that.mydoclist.length>0 ){
+          that.showEmptyData = false
+          that.myTotalDocNum = res.data.docs.totalCount
+          that.page_total = res.data.docs.totalPage
+          that.$apply()
+        } else if ( that.firstload ) {
+          that.firstload = false
+          that.go_url('/pages/i','switchTab')
+        }
+        that.$apply()
+      })
+    }
+  }
+
+  onPullDownRefresh() {
+    this.showLoadMore = true
+    this.getMyDocs(1)
+    this.$apply()
+  }
+
+  onReachBottom() {
+    let that = this;
+    that.showLoadMore = true
+    //判断总页数是否大于翻页数
+    if ((that.page_total) > that.currentPage) {
+      //防止重复加载
+      if (that.preventRepeatReuqest) {
+        return true
+      }
+      that.preventRepeatReuqest = true
+      that.currentPage++
+      that.getMyDocs(that.currentPage)
+      that.preventRepeatReuqest = false
+    } else {
+      that.showLoadMore = false
+    }
+  }
+
+  onLoadM(data){
+    if( wepy.$instance.globalData.userkey.userAuthed ) {
+      this.userInfoAuthed = true
+      this.getMyDocs(1)
+    } else {
+      this.userInfoAuthed = false
+    }
+    this.$apply()
+  }
+
+}
+</script>

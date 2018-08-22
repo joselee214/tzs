@@ -1,0 +1,259 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+
+
+.zan-loadmore--nodata{
+  margin: 120px auto;
+}
+.zan-panel {
+  margin-top:0;
+}
+
+.smallavatar{
+  margin: 0 10px;
+}
+.dataintro{
+  text-align: center;
+  display: block;
+  color: red;
+}
+.green{
+  color: green;
+}
+.groupid,.created_at{
+  color: #999999;
+  font-size: 11px;
+}
+
+</style>
+<template>
+<view class="container">
+
+  <zanLoadmore1 :loading.sync="showLoadMore" > </zanLoadmore1>
+  <zanLoadmore2 :nodata.sync="showEmptyData" nodata_str="暂无文档"></zanLoadmore2>
+  <zanToast></zanToast>
+
+  <view class="zan-panel" wx:if="{{post}}">
+    <view class="zan-cell zan-field">
+      <view class="zan-cell__bd">文档ID</view>
+      <view class="zan-cell__ft">
+        {{id}}
+      </view>
+    </view>
+    <view class="zan-cell zan-field">
+      <view class="zan-cell__bd">标题</view>
+      <view class="zan-cell__ft">
+        {{post.title}}
+      </view>
+    </view>
+    <view class="zan-cell zan-field">
+      <view class="zan-cell__bd">发布时间</view>
+      <view class="zan-cell__ft">
+        {{post.created_at}}
+      </view>
+    </view>
+    <view class="zan-cell zan-field">
+      <view class="zan-cell__bd">已阅人数</view>
+      <view class="zan-cell__ft">
+         {{post.viewtimes}}
+      </view>
+    </view>
+    <view class="zan-cell zan-field">
+      <view class="zan-cell__bd">回复人数</view>
+      <view class="zan-cell__ft">
+         {{post.replytimes}}
+      </view>
+    </view>
+
+    <view class="zan-cell zan-field"></view>
+    
+    
+
+    <view class="zan-cell zan-field dataintro" wx:if="{{dataintro}}">{{dataintro}}</view>
+
+    <view class="zan-cell zan-cell--switch" wx:if="{{post.sign_up_options}}">
+      <view class="zan-cell__bd">启用报名 (关闭不影响报名数据)</view>
+      <view class="zan-cell__ft">
+        <zanSwitch :checked.sync="canSignUp" componentId="zanSwitch"> </zanSwitch>
+      </view>
+    </view>
+
+    <view class="zan-cell zan-field" wx:if="{{post.sign_up_options}}">
+      <view class="zan-cell__bd">已报名人数</view>
+      <view class="zan-cell__ft">
+        {{datas.signnums}} 
+        <text class="green" @tap="copySignUrl" wx:if="{{datas.signnums>0}}">下载查看数据</text><view class="zan-icon zan-icon-arrow" style="color: #4b0;" @tap="copySignUrl" wx:if="{{datas.signnums>0}}"></view>
+      </view>
+    </view>
+
+    <view class="zan-cell zan-field"></view>
+
+    <view class="zan-cell zan-field" wx:if="{{datas.groupUserNums.length>0}}">
+      <view class="zan-cell__bd green">已转发群 ({{datas.groups.length}})</view>
+      <view class="zan-cell__ft">
+        已阅人数/群总人数
+      </view>
+    </view>
+
+    <view wx:if="{{datas.groupUserNums.length>0}}">
+    <repeat for="{{datas.groupUserNums}}" item="item" key="ind" index="ind">
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__bd">
+            <view class="groupname"><open-data type="groupName" open-gid="{{item.gid}}"></open-data></view>
+            <view class="groupid">{{item.gid}}</view>
+          </view>
+          <view class="zan-cell__ft">
+            {{item.postgroupnums}} / {{item.allusernums}} 
+            <text class="green" data-gid="{{item.gid}}" @tap="goGroupData">查看</text><view @tap="goGroupData" data-gid="{{item.gid}}" class="zan-icon zan-icon-arrow" style="color: #4b0;"></view>
+          </view>
+        </view>
+    </repeat>
+    </view>
+
+    <view class="zan-cell zan-field"></view>
+
+    <view class="zan-cell zan-field" wx:if="{{datas.sharelogs.length>0}}">
+      <view class="zan-cell__bd green">分享群记录 (<text wx:if="{{datas.sharelogs.length>50}}">50/</text>{{datas.sharelogs.length}})</view>
+      <view class="zan-cell__ft">
+        转发者/转发时间
+      </view>
+    </view>
+
+    <view wx:if="{{datas.sharelogs.length>0}}">
+    <repeat for="{{datas.sharelogs}}" item="item" key="ind" index="ind">
+        <view class="zan-cell zan-field">
+          <view class="zan-cell__bd">
+            <view class="groupname"><open-data type="groupName" open-gid="{{item.gid}}"></open-data></view>
+            <view class="groupid">{{item.gid}}</view>
+          </view>
+          <view class="zan-cell__ft">
+            <view><image class="smallavatar" src="{{item.avatar}}" mode="aspectFit"/> {{item.nickname}}</view>
+            <view class="created_at">{{item.created_at}}</view>
+          </view>
+        </view>
+    </repeat>
+    </view>
+
+  </view>
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+import tip from '../libs/tip'
+import zanLoadmore from '../components/zan-loadmore'
+import zanToast from '../components/zan-toast'
+import zanSwitch from '../components/zan-switch'
+
+export default class pagespostdata extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '文档数据'
+  }
+  components = {
+    zanLoadmore1: zanLoadmore,
+    zanLoadmore2: zanLoadmore,
+    zanToast:zanToast,
+    zanSwitch:zanSwitch
+  }
+  data = {
+    dataintro:'',
+    id:'',
+    post:{},
+    datas:{},
+    canSignUp:false,
+    showEmptyData:false,
+    showLoadMore:false
+  }
+  events = {
+    zanSwitchChange(event) {
+      let that = this
+      let { checked,componentId } = event.source
+      that.canSignUp = !checked
+      wepy.$instance.getSession().then(r=>{
+        api.switchSign({query:{pid:that.id,can_sign_up:that.canSignUp?1:0}}).then(res=>{
+          that.showLoadMore = false
+            if(res && res.data && res.data.status==1){
+              that.post.can_sign_up = parseInt(res.data.can_sign_up)
+              that.canSignUp = that.post.can_sign_up==1
+              that.$invoke('zanToast', 'showZanToast', { title: res.data.msg, timeout: 2000 })
+              that.$apply()
+            } else if ( res.data.errorcode==1 ){
+              that.canSignUp = false
+              that.$invoke('zanToast', 'showZanToast', { title: res.data.msg, timeout: 5000 })
+      that.$apply()
+            }
+        })
+      },r=>{})
+    }
+  }
+  methods = {
+    copySignUrl(e){
+      let that = this
+      wepy.$instance.getSession().then(r=>{
+        that.go_url('/pages/postdatawebview?id='+that.id+'&type=sign','navigate')
+      },r=>{})
+    },
+    goGroupData(e){
+      let that = this
+      var gid = e.currentTarget.dataset.gid
+      wepy.$instance.getSession().then(r=>{
+        that.go_url('/pages/postdatawebview?id='+that.id+'&gid='+gid+'&type=group','navigate')
+      },r=>{})
+    }
+  }
+
+  getData(id){
+      let that = this
+      if( parseInt(id)>0 ){
+        that.showLoadMore = true
+        wepy.$instance.getSession().then(r=>{
+          api.postdata({query:{pid:id}}).then(res=>{
+            that.showLoadMore = false
+              if(res && res.data && res.data.status==1){
+                that.post = res.data.post
+                that.canSignUp = that.post.can_sign_up==1
+                that.datas = res.data.datas
+
+                that.dataintro = res.data.dataintro
+
+                that.$apply()
+              } else {
+                that.showEmptyData = true
+              }
+          })
+        },r=>{})
+      } else {
+        that.showEmptyData = true
+      }
+    that.$apply()
+  }
+
+  onShow () {
+  }
+
+
+  onPullDownRefresh() {
+    this.getData(this.id)
+  }
+
+  onLoad(option) {
+    option = this.scene_explode(option)
+    let that = this
+    that.id = option.id || 0
+  }
+
+  onLoadM(data){
+    let that = this
+    this.getData(this.id)
+  }
+}
+</script>

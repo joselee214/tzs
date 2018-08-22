@@ -1,0 +1,403 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+
+
+.tzs_intro{
+  margin: 10px 40px 10px;
+  padding: 15px;
+  background: #ffffff;
+  color: #999999;
+  font-size: 14px;
+  text-align: center;
+  border: 1px dashed #cccccc;
+}
+.zan-loadmore--nodata{
+  margin: 120px auto;
+}
+.zan-panel {
+  margin-top:0;
+}
+.postForm{
+  padding-top: 5px;
+}
+.zan-icon {
+  font-size: 18px;
+}
+.title_icon{
+  margin: 0 2px 0 20px;
+  font-size: 14px;
+}
+.title_posts_num{
+  font-size: 14px;
+  color: #777;
+}
+.newUploadText{
+  margin-left:10px;
+  color: #888888;
+  font-size: 18px;
+}
+
+.zan-card{
+  padding: 15px 20px;
+}
+.zan-card__left-col{
+  margin-right: 0px;
+}
+.zan-card__thumb{
+  width: 72px;
+}
+.zan-card__detail{
+  margin-left: 85px;
+  margin-right: 25px;
+}
+.zan-card__right-col{
+  margin-top:40px;
+}
+.doc_mark_row .zan-icon{
+  font-size: 14px;
+}
+.doc_mark{
+  margin:0 36px 0 4px;
+}
+
+
+.doc_admin_row{
+  margin-top: 8px;
+  opacity:0.5;
+}
+.doc_admin_row .zan-icon{
+  font-size: 12px;
+}
+.doc_admin_row .zan-btn{
+  margin-right: 20px;
+}
+
+.realname{
+  text-decoration: underline;
+  display: inline;
+}
+.nickName{
+  display: inline;
+  text-decoration: underline;
+}
+.meConfig{
+  margin: 10px;
+}
+.zan-field__input{
+  text-align: right;
+}
+
+</style>
+<template>
+<view class="container">
+
+
+  <view class="zan-panel" wx:if="{{!showMeConfig}}">
+    <view class="doc-title" style="padding:15px 0 0;line-height:30px;" @tap="showConfig">
+      你好，<view class="realname">{{realname}}</view>
+      <view class="nickName" wx:if="{{realname==''}}"><open-data type="userNickName"></open-data></view>
+      <view class="zan-icon zan-icon-pending-orders title_icon" wx:if="{{myTotalDocNum>0}}" style="color: #4b0;"></view>
+      <text class="title_posts_num" wx:if="{{myTotalDocNum>0}}">{{myTotalDocNum}}</text>
+    </view>
+    <view class="zan-btns">
+      <button class="zan-btn zan-btn--primary"  wx:if="{{userInfoAuthed}}" @tap="newPost">+ 新增发布</button>
+      <button open-type="getUserInfo" class="zan-btn zan-btn--primary" bindgetuserinfo="bindgetuserinfo" wx:if="{{!userInfoAuthed}}">
+        + 新增发布(授权)
+      </button>
+    </view>
+  </view>
+
+  <view class="zan-panel meConfig" wx:if="{{showMeConfig}}">
+      <form bindsubmit="formSubmit" report-submit="true">
+      <view class="zan-panel-title">我的设置</view>
+      <view class="zan-cell zan-field zan-field--error">
+        <view class="zan-cell__hd zan-field__title">真实姓名</view>
+        <input class="zan-field__input zan-cell__bd" name="realname" placeholder="请输入真实姓名" placeholder-class="zan-field__placeholder" type="text" value="{{realname}}" selection-start="-1" selection-end="-1" cursor="-1">
+        请输入真实姓名
+        </input>
+      </view>
+      <view>
+        <button class="zan-btn zan-btn--primary button-hover" form-type="submit">更新信息</button>
+        <button class="zan-btn" @tap="cancelSub">取消</button>
+      </view>
+      </form>
+  </view>
+
+
+  <view class="zan-panel" wx:if="{{!showMeConfig}}">
+    <repeat for="{{mydoclist}}" item="item" key="ind" index="ind">
+    <view class="zan-card" wx:if="{{item}}">
+      <view class="zan-card__thumb" @tap="_go_url('/pages/d?id={{item.id}}&fromi=1','navigate')">
+        <image class="zan-card__img" src="{{item.logo}}" mode="aspectFit"/>
+      </view>
+      <view class="zan-card__right-col" @tap="_go_url('/pages/d?id={{item.id}}&fromi=1','navigate')">
+        <view class="zan-icon zan-icon-arrow" style="color: #4b0;"></view>
+      </view>
+      <view class="zan-card__detail">
+        <view class="zan-card__detail-row" wx:if="{{item.title}}" @tap="_go_url('/pages/d?id={{item.id}}&fromi=1','navigate')">
+          <view class="zan-card__left-col zan-ellipsis--l2 doc_content_area">
+             {{item.title}}
+          </view>
+        </view>
+        <view class="zan-card__detail-row" @tap="_go_url('/pages/d?id={{item.id}}&fromi=1','navigate')">
+          <view class="zan-card__left-col zan-c-gray">{{item.created_at}}</view>
+        </view>
+
+        <view class="zan-card__detail-row zan-c-gray-darker" @tap="_go_url('/pages/d?id={{item.id}}&fromi=1','navigate')">
+          <view class="zan-card__left-col zan-ellipsis--l3 doc_content_area">
+            {{item.content}}
+          </view>
+        </view>
+
+        <view class="zan-card__detail-row doc_mark_row" @tap="_go_url('/pages/d?id={{item.id}}&fromi=1','navigate')">
+          <view class="zan-icon zan-icon-contact"  style="color: #4b0;"></view>
+          <text class="zan-c-gray doc_mark">{{item.viewtimes}}</text>
+          <view class="zan-icon zan-icon-chat"  style="color: #4b0;" wx:if="{{item.allowReply==1}}"></view>
+          <text class="zan-c-gray-dark doc_mark" wx:if="{{item.allowReply==1}}">{{item.replytimes}}</text>
+          <view class="zan-icon zan-icon-pending-orders"  style="color: #4b0;" wx:if="{{item.sign_up_options}}"></view>
+          <text class="zan-c-gray-dark doc_mark" wx:if="{{item.sign_up_options}}">{{item.signtimes}}</text>
+        </view>
+        <view class="zan-card__detail-row doc_admin_row">
+          <view class="zan-btn zan-btn--mini zan-btn--danger zan-btn--plain" @tap.stop="deleteDoc" data-id="{{item.id}}" data-index="{{ind}}">
+            <view class="zan-icon zan-icon-delete zan-c-red"></view> 删除
+          </view>
+          <view class="zan-btn zan-btn--mini zan-btn--primary zan-btn--plain" @tap.stop="editDoc" data-id="{{item.id}}">
+            <view class="zan-icon zan-icon-edit-data zan-c-green"></view> 编辑
+          </view>
+          <view class="zan-btn zan-btn--mini zan-btn--primary zan-btn--plain" @tap.stop="dataDoc" data-id="{{item.id}}">
+            <view class="zan-icon zan-icon-search zan-c-green"></view> 数据
+          </view>
+        </view>
+
+
+      </view>
+    </view>
+    </repeat>
+
+    <zanLoadmore2 :nodata.sync="showEmptyData" nodata_str="暂无文档"></zanLoadmore2>
+    <zanLoadmore1 :loading.sync="showLoadMore" > </zanLoadmore1>
+
+    <view class="tzs_intro">
+      {{intro}}
+    </view>
+  
+    <zanToast></zanToast>
+  </view>
+
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+import tip from '../libs/tip'
+import zanLoadmore from '../components/zan-loadmore'
+import zanToast from '../components/zan-toast'
+
+export default class pagesi extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '我的文档'
+  }
+  components = {
+    zanLoadmore1: zanLoadmore,
+    zanLoadmore2: zanLoadmore,
+    zanToast:zanToast
+  }
+  data = {
+    intro:'',
+
+    realname:'',
+
+    showMeConfig:false,
+
+    editpost:{},
+
+    userInfoAuthed : false,
+
+    mydoclist:[],
+
+    showLoadMore:true,
+    showEmptyData:true,
+
+    myTotalDocNum:0,
+    preventRepeatReuqest: false,
+    currentPage: 1,
+    page_total: 0
+  }
+  methods = {
+    bindgetuserinfo(e){
+      if( e.detail.userInfo!=undefined && e.detail.userInfo.nickName!=undefined ) {
+        this.uploadUserInfo(e.detail)
+      }
+    },
+    newPost(){
+      this.newPost()
+    },
+    showConfig(){
+      if( this.userInfoAuthed ){
+        this.showMeConfig = true
+        this.$apply()
+      }
+    },
+    formSubmit(e){
+      let that = this
+      api.updateUserInfo({query:{realname:e.detail.value.realname,formId:e.detail.formId,meconfig:1}}).then(res=>{
+        console.log(res)
+          if( res.data && res.data.status==1 && res.data.realname!=undefined ){
+            wepy.$instance.globalData.userkey.realname = res.data.realname
+            wepy.setStorageSync('USER_KEY_INFO', wepy.$instance.globalData.userkey.realname)
+            that.realname = res.data.realname
+            that.showMeConfig = false
+            that.$apply()
+          }
+      })
+    },
+    cancelSub(e){
+      let that = this
+      that.showMeConfig = false
+      that.$apply()
+    },
+    editDoc(e){
+      var id = e.currentTarget.dataset.id
+      this.editPost(id)
+    },
+    dataDoc(e){
+      var id = e.currentTarget.dataset.id
+      wepy.$instance.getSession().then(r=>{
+        this.go_url('/pages/postdata?id='+id,'navigate')
+      },r=>{})
+    },
+    deleteDoc(e){
+      var id = e.currentTarget.dataset.id
+      var ind = e.currentTarget.dataset.index
+      let that = this
+      tip.confirm('是否删除该文档?').then(r=>{
+      console.log(id,ind)
+      wepy.$instance.getSession().then(r=>{
+        api.deletePost({query:{id:id}}).then(res=>{
+            if(res && res.data && res.data.status==1){
+              that.mydoclist.splice(ind,1)
+              that.$apply()
+              if( that.mydoclist.length<6 ){
+                that.getMyDocs(1)
+              }
+            }
+        })
+      })
+      },r=>{})
+    }
+  }
+
+  editPost(id){
+      let that = this
+      wepy.$instance.getSession().then(r=>{
+        this.go_url('/pages/iadd?id='+id,'navigate')
+      },r=>{})
+  }
+
+  newPost(){
+    let that = this
+    this.go_url('/pages/iadd','navigate')
+  }
+
+  onShow () {
+    this.intro = wepy.$instance.globalData.userkey.intro
+    var s = wepy.getStorageSync('TEMP_SET')
+    if( s && s=='add' ){
+      this.$invoke('zanToast', 'showZanToast', { title: '已成功发布!', timeout: 2000 })
+      this.getMyDocs(1)
+    }
+    wepy.removeStorageSync('TEMP_SET')
+
+    if( wepy.$instance.globalData.userkey.realname!=undefined && wepy.$instance.globalData.userkey.realname!='' ){
+      this.realname = wepy.$instance.globalData.userkey.realname
+    }
+    this.$apply()
+  }
+
+  async uploadUserInfo(detail) {
+    let that = this
+    wepy.$instance.updateUserInfo(detail).then(resp=>{
+        var rlt = resp.data
+        console.log('uploadUserInfo',rlt)
+        if( rlt.reguid!=undefined && parseInt(rlt.reguid)>0 ){
+          that.userInfoAuthed = true
+          that.newPost()
+          that.getMyDocs()
+        }
+    })
+  }
+
+  onPullDownRefresh() {
+    this.showLoadMore = true
+    this.mydoclist = []
+    this.getMyDocs(1)
+    this.$apply()
+  }
+
+  getMyDocs(currentPage){
+    if( this.userInfoAuthed )
+    {
+      this.showLoadMore = true
+      this.$apply()
+      let that = this
+      currentPage = currentPage || 1
+      api.getMyDocs({query:{page:currentPage}}).then(res=>{
+        console.log('getMyDocs',res)
+        if(currentPage==1) {
+          that.mydoclist = []
+        }
+        if(res.data.list){
+          that.mydoclist.push(...res.data.list.items)
+        }
+        if( that.mydoclist.length>0 ){
+          that.showEmptyData = false
+          that.myTotalDocNum = res.data.list.totalCount
+          that.page_total = res.data.list.totalPage
+        }
+        that.showLoadMore = false
+        that.$apply()
+      })
+    }
+  }
+
+  onReachBottom() {
+    let that = this
+    that.showLoadMore = true
+    //判断总页数是否大于翻页数
+    if ((that.page_total) > that.currentPage) {
+      //防止重复加载
+      if (that.preventRepeatReuqest) {
+        return true
+      }
+      that.preventRepeatReuqest = true
+      that.currentPage++
+      that.getMyDocs(that.currentPage)
+      that.preventRepeatReuqest = false
+    } else {
+      that.showLoadMore = false
+    }
+  }
+
+  onLoadM(data){
+    let that = this
+    console.log('onLoadMonLoadMonLoadM in pagesi',wepy.$instance.globalData.userkey)
+    if( wepy.$instance.globalData.userkey.userAuthed ) {
+      this.userInfoAuthed = true
+
+    } else {
+      this.showLoadMore = false
+    }
+    this.getMyDocs()
+    this.$apply()
+  }
+}
+</script>

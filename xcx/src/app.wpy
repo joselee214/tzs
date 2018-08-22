@@ -1,0 +1,315 @@
+<style lang="css">
+@import '/zanui/helper.wxss';
+
+.container {
+  background: #f9f9f9;
+  overflow: hidden;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 0;
+}
+.container::before {
+  position: fixed;
+  top: 0;
+  left: 0;
+  content: ' ';
+  width: 100%;
+  height: 1rpx;
+  background-color: #e2e2e2;
+  z-index: 5;
+}
+.doc-title {
+  position: relative;
+  padding: 15px 0;
+  margin: 10px 15px;
+  line-height: 25px;
+  font-size: 25px;
+  color: #666;
+}
+.doc-description {
+  margin: 14px 0;
+  padding: 0 15px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #666;
+}
+
+
+.page-bottom-bar {
+  width: 100%;
+  border-top: 1px solid #cccccc;
+  position: fixed;
+  bottom: 0;
+  background: #ffffff;
+  z-index: 1001;
+}
+.page-bottom-bar-box {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  position: relative;
+  padding: 0rpx 0 0;
+  height: 47px;
+}
+.page-bottom-bar-box-block{
+    text-align:center;
+    width: 25%;
+}
+.bottom_text{font-size:10px;}
+.bottom_imgl{width: 27px;height: 27px;margin:0 auto 2px;}
+.bottom_img{width: 27px;height: 27px;}
+
+.smallavatar {
+    width: 20px;
+    height: 20px;
+}
+.show_web_version{
+  text-align: center;
+  color: #999999;
+  background: #f3f3f3;
+  font-size: 12px;
+  padding: 4px 0;
+  margin: 10px 2px;
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import Promise from 'promise-polyfill'
+import api from './libs/api'
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/docs',
+      'pages/i',
+      'pages/iadd',
+      'pages/d',
+      'pages/uploadwebview',
+      'pages/postdata',
+      'pages/postdatawebview'
+    ],
+    window: {
+      navigationBarBackgroundColor: '#FAFAFA',
+      navigationBarTitleText: '通知说',
+      navigationBarTextStyle: 'black',
+      backgroundTextStyle: 'dark',
+      backgroundColor: '#f9f9f9',
+      enablePullDownRefresh:true
+    },
+    tabBar: {
+      "color": "#bbbbbb",
+      "selectedColor": "#222222", //a3c83a
+      "backgroundColor": "#ffffff",
+      "borderStyle": "black",
+      "list": [
+      {
+        "pagePath": "pages/docs",
+        "text": "通知说",
+        "iconPath": "images/1.png",
+        "selectedIconPath": "images/11.png"
+      }, {
+        "pagePath": "pages/i",
+        "text": "我",
+        "iconPath": "images/3.png",
+        "selectedIconPath": "images/31.png"
+      }
+      ]
+    },
+    debug: false
+  }
+
+  globalData = {
+    userkey:{},  //登录的关键信息
+    user: {}, //一般用户信息
+    appid: 'wxd987482b4d894bc5',
+    env: 'test',
+    systeminfo:{},
+    lunchOptions:{}
+  }
+
+  onLaunch(lunchres) {
+    const updateManager = wx.getUpdateManager()
+    updateManager.onUpdateReady(function () {
+      wx.showModal({
+        title: '更新提示',
+        showCancel: false,
+        content: '检查到更新,立即重启应用！',
+        success: function (res) {
+          //if (res.confirm) {
+            // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+            updateManager.applyUpdate()
+          //}
+        }
+      })
+    })
+
+//      console.log(' lunchres :',lunchres)
+    let that = this
+    wepy.getSystemInfo().then(res=>{
+      that.globalData.systeminfo = res
+//     console.log('that.globalData.systeminfo...',that.globalData.systeminfo)
+    })
+  }
+
+  onShow(appOnShowRes){
+      //shareTicket
+      // console.log(' appOnShowRes :',appOnShowRes)
+      this.globalData.lunchOptions = appOnShowRes
+  }
+
+  getSavedFilesMap(){
+    var s = wepy.getStorageSync('SAVED_FILES_MAP') || {}
+    return s
+  }
+
+  getSavedFileByFileid(fileid){
+    var savedfiles = this.getSavedFilesMap()
+    return savedfiles['f'+fileid]
+  }
+
+  // checkSavedFile(localfilepath){
+  //   let zz = wepy.getSavedFileList()
+  //   return zz
+  // }
+
+  setSavedFile(fileid,filepath){
+    var savedfiles = this.getSavedFilesMap()
+    savedfiles['f'+fileid] = filepath
+    wepy.setStorageSync('SAVED_FILES_MAP', savedfiles)
+  }
+
+  delSavedFileByFileid(fileid){
+    var savedfiles = this.getSavedFilesMap()
+    var filepath = savedfiles['f'+fileid]
+    wx.removeSavedFile({filePath:filepath})
+    delete savedfiles['f'+fileid]
+    wepy.setStorageSync('SAVED_FILES_MAP', savedfiles)
+  }
+
+  async getSession(p){
+    let that = this
+    p = p || {}
+    this.globalData.userkey = wepy.getStorageSync('USER_KEY_INFO') || {}
+    console.log('getSession that.globalData.userkey',that.globalData.userkey)
+    // console.log('that.globalData.userkey.expires_in',(Date.now() + 600))
+    console.log('that.globalData.userkey.expires_in',that.globalData.userkey.expires_in - Date.now() )
+    return new Promise(function(resolve,reject){
+       wepy.checkSession().then(res=>{
+        //console.log('checkSession...ing',res)
+        if ( p.forceRelogin!=undefined || that.globalData.userkey.openid==undefined || that.globalData.userkey.expires_in<=0 || ( (that.globalData.userkey.expires_in>0) && ((that.globalData.userkey.expires_in - Date.now())< 0 ) ) ) {
+          console.log('checkSession...fail')
+          that.getSessionViaWxLogin(p).then(r=>{resolve(r)},r=>{reject(r)})
+        } else {
+          resolve("checkSession success")
+        }
+      },res=>{
+        console.log('checkSession...!!!...fail',res)
+        return that.getSessionViaWxLogin(p).then(r=>{resolve(r)},r=>{reject(r)})
+      })
+    })
+  }
+
+  async getSessionViaWxLogin(p){
+    p = p || {}
+    let that = this
+    return new Promise(function(resolve,reject){
+        wepy.login().then(res=>{
+        console.log("wepy.login get code :" ,res)
+        that.getSessionByCode(res.code,p).then(r=>{resolve(r)},r=>{reject(r)})
+      })
+    })
+  }
+
+  async getSessionByCode(code,p){
+    p = p || {}
+    let that = this
+    return new Promise(function(resolve,reject){
+        p._jscode = code
+        api.wxJsCode2Session({
+            query: p
+          }).then(resp=>{
+            var rlt = resp.data
+            console.log("获取服务端用户信息 wxJsCode2Session ...",rlt)
+
+            if (rlt.result==1 && rlt.data!=undefined && rlt.data.openid!=undefined) {
+              var data = rlt.data
+                data.expires_in = 1000*parseInt(data.expires_in) + Date.now()
+                //存储
+               that.globalData.userkey = data
+               that.globalData.userkey.userAuthed = false
+
+                if( data.uid!=undefined && parseInt(data.uid)>0 ){
+                  //获取+更新userInfo //已有uid了 //延迟更新 userinfo
+                    wepy.getUserInfo({withCredentials:true}).then(resuser=>{
+                      that.globalData.userkey.userAuthed = true
+                      wepy.setStorageSync('USER_KEY_INFO', that.globalData.userkey)
+                      if(resuser.userInfo && data.updateUinfo!=undefined && parseInt(data.updateUinfo)>0 ){
+                        setTimeout(()=>{
+                            that.updateUserInfo(resuser)
+                        }, data.updateUinfo)
+                      }
+                      resolve(rlt)
+                    },r=>{
+                      wepy.setStorageSync('USER_KEY_INFO', that.globalData.userkey)
+                      reject({error:'getUserInfo error !'})
+                      console.log('getUserInfo error !')
+                    })
+                } else {
+                  //没有 uid //已授权数据补救 //未授权
+                    wepy.getUserInfo({withCredentials:true}).then(resuser=>{
+                      wepy.setStorageSync('USER_KEY_INFO', that.globalData.userkey)
+                      if(resuser.userInfo && data.updateUinfo!=undefined && parseInt(data.updateUinfo)>0 ){
+                        that.updateUserInfo(resuser)
+                      }
+                      resolve(rlt)
+                    },r=>{
+                      that.globalData.userkey.userAuthed = false
+                      wepy.setStorageSync('USER_KEY_INFO', that.globalData.userkey)
+                      reject({error:'getUserInfo error !'})
+                      console.log('getUserInfo error !')
+                    })
+                }
+            } else {
+              reject({error:'request result error !'+ JSON.stringify(rlt)})
+            }
+
+          },r=>{
+            reject({error:'request error!'})
+          })
+    })
+  }
+
+  async askUserinfo(){
+
+  }
+
+  async updateUserInfo(detail) {
+    let that = this
+    console.log(detail)
+    var qinfo = detail.userInfo
+    qinfo.encryptedData = detail.encryptedData
+    qinfo.iv = detail.iv
+    qinfo.signature = detail.signature
+    console.log('qinfo qinfo',qinfo)
+    let rlt = await api.updateUserInfo({
+      query:qinfo
+    })
+    console.log('updateUserInfo ::: ',that.globalData.userkey)
+    if( rlt.data.reguid!=undefined && parseInt(rlt.data.reguid)>0 ){
+      that.globalData.userkey.uid = rlt.data.reguid
+      that.globalData.userkey.userAuthed = true
+      wepy.setStorageSync('USER_KEY_INFO', that.globalData.userkey)
+    }
+    return Promise.resolve(rlt)
+  }
+
+  constructor() {
+    super()
+    this.use('requestfix')
+    this.use('promisify')
+  }
+}
+</script>

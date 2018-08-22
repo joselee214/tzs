@@ -1,0 +1,44 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+@import '/zanui/col.wxss';
+@import '/zanui/row.wxss';
+
+</style>
+<template>
+<view class="container">
+  <web-view src="{{url}}"></web-view>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+
+export default class pagesuploadwebview extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '上传文档'
+  }
+  data = {
+    url:''
+  }
+  methods = {
+  }
+  
+  onLoad() {
+    this.url = api.uploadwebview()  // api.apiGate() + '/'
+    console.log(this.url)
+  }
+
+  onLoadM(data){
+  }
+
+}
+</script>

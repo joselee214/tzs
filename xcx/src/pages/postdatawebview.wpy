@@ -1,0 +1,51 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+@import '/zanui/col.wxss';
+@import '/zanui/row.wxss';
+
+</style>
+<template>
+<view class="container">
+  <web-view src="{{url}}"></web-view>
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+
+export default class pagespostdatawebview extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '文档数据'
+  }
+  data = {
+    url:''
+  }
+  methods = {
+  }
+  
+  onLoad(option) {
+    option = this.scene_explode(option)
+    let that = this
+    that.id = option.id || 0
+    if( option.type=='sign' ){
+      this.url = api.postSigndataUrl()+'&from=wxxcx&pid='+option.id
+    } else {
+      this.url = api.postGroupdataUrl()+'&from=wxxcx&pid='+option.id+'&gid='+option.gid
+    }
+    console.log(this.url)
+  }
+
+  onLoadM(data){
+  }
+
+}
+</script>

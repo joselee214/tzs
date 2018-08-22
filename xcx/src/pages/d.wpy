@@ -1,0 +1,1004 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+@import '/zanui/col.wxss';
+@import '/zanui/row.wxss';
+
+.zan-panel {
+  margin-top:0;
+}
+.page-bottom-bar-box-block{
+    width: 50%;
+}
+
+.doc-title{
+  padding:10px 0 0;line-height:30px;text-align:center;
+}
+
+.doc{
+  margin: 0 15px;
+  padding: 10px 0 5px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.doc_auth{
+  border-top: 1px dashed #cccccc;
+}
+.avatar{
+  width: 16px;
+  height: 16px;
+}
+.nickname{
+  font-size: 15px;
+  margin-left: 5px;
+}
+.created_at{
+  color: #cccccc;
+  padding: 0 0 5px;
+}
+
+
+.doc_mark{
+  padding: 2px 0 0;
+}
+
+.zan-col {
+  line-height: 30px;
+  text-align: center;
+  background-color: #eee;
+  font-size: 12px;
+  color: #999;
+}
+
+.doc_content{
+  padding: 5px 0;
+  color: #333333;
+  text-align: left;
+}
+.doc_imgs{
+  padding: 0;
+  margin: 0;
+  font-size:0;
+}
+.doc_imgs img {display:block;}
+
+.filecell{
+  padding: 12px 0;
+  justify-content:space-between;
+}
+.zan-cell__bd{
+  text-align: left;
+  overflow:hidden;
+}
+.groupname{
+  font-size: 11px;
+  color: #999999;
+  margin-left: 22px;
+}
+.zan-cell__ft{
+  text-align: right;
+  max-width: 38%;
+}
+
+.viewlogs_time{
+  font-size: 12px;
+}
+
+
+.sharebtn{
+  position: absolute;  
+  top: 0px;  
+  left: 0px;
+  padding: 0;
+  margin: 0;
+  width:100%;
+  height:100%;
+  opacity: 0; 
+  overflow: hidden; 
+}
+.act-help{
+  text-align: center;
+  font-size: 10px;
+  color: #bbbbbb;
+  display:block;
+}
+
+
+.wxParse-inline{
+  display:inline-block;
+}
+text:empty{
+  height: 1px;
+  line-height: 1px;
+}
+
+.realname_div{
+  margin: 20px 10px;
+  border: 1px dashed green;
+  padding: 10px;
+  background: #f9f9f9;
+}
+.realname_notice{
+  font-size: 10px;
+}
+.realname_input{
+  border: 1px solid #999999;
+  padding: 2px 5px;
+  margin: 10px 0;
+}
+
+.shardiv{
+  position: relative;
+}
+.post_bar{
+  margin-top: 5px;
+  border-top: 2px solid #a3c83a;
+  justify-content: space-between;
+}
+.post_bars{
+  padding-bottom:5px;
+}
+.replytimes{
+  text-align: right;
+}
+.viewtimes{
+  text-align: left;
+}
+.reply_title{
+  margin-top: 5px;
+  padding: 4px 4px 4px;
+  background: #f9f9f9;
+  font-size: 12px;
+  color: #999999;
+}
+.reply_content{
+  padding: 6px 0 6px 10px;
+  text-align:left;
+}
+.reply_delete{
+  text-align: right;
+  justify-content: flex-end;
+  padding: 0 0 6px 0;
+}
+.reply_opt_a{
+  display: inline-block;
+  margin-left: 10px;
+  color:#c5e66b;
+}
+.smallavatar{
+  width: 20px;
+  height: 20px;
+}
+.sign_up_div{
+  background: #f3f3f3;
+}
+.sign_a{
+  justify-content: center;
+  color: green;
+}
+.sign_up_div .zan-cell{
+  padding: 2px 5px;
+}
+.sign_form{
+  display: block;
+}
+.sign_form_cell{
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+.sign_content{
+  text-align: right;
+}
+.sign_title{
+  padding: 10px 0 3px 0;
+  color: #666666;
+}
+.sign_value{
+  padding: 0 3px;
+  margin-left: 10px;
+  background: #ffffff;
+}
+</style>
+<template>
+<view class="container">
+
+  <view class="page-bottom-bar">
+    <view class="page-bottom-bar-box">
+      <view class="page-bottom-bar-box-block" @tap="_go_url('/pages/docs','switchTab')">
+        <view class="bottom_imgl">
+          <image class="bottom_img" src="../images/1.png" mode="aspectFit" />
+        </view>
+        <view class="bottom_text">通知说</view>
+      </view>
+      <view class="page-bottom-bar-box-block" @tap="_go_url('/pages/i','switchTab')">
+        <view class="bottom_imgl">
+          <image class="bottom_img" src="../images/3.png" mode="aspectFit" />
+        </view>
+        <view class="bottom_text">我</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="zan-panel" wx:if="{{!userInfoAuthed}}" style="padding:100px 10px 0;">
+    <button open-type="getUserInfo" class="zan-btn zan-btn--primary" bindgetuserinfo="bindgetuserinfo">
+        需要授权基本信息才能阅览文档
+    </button>
+  </view>
+
+  <view class="zan-panel" wx:if="{{userInfoAuthed}}">
+
+    <view wx:if="{{doc.post}}">
+
+      <import src="../libs/wxParse/wxParse.wxml" />
+      
+
+      <view class="realname_div" wx:if="{{!realnameSeted}}">
+        <form bindsubmit="formSubmit" report-submit="true">
+        <view class="realname_notice">{{introrealname}}</view>
+        <view>
+          <input class="zan-field__input zan-cell__bd realname_input" name="realname" placeholder="真实姓名" placeholder-class="zan-field__placeholder" type="text" value="{{doc.me.nickName}}" />
+        </view>
+        <view>
+          <button class="zan-btn zan-btn--primary button-hover" form-type="submit">提交真实姓名</button>
+        </view>
+        </form>
+      </view>
+
+      <view wx:if="{{doc.post.title}}" class="doc-title">
+        {{doc.post.title}}
+      </view>
+
+      <view class="doc doc_auth" wx:if="{{doc.post.nickname}}">
+        <image class="avatar" src="{{doc.post.avatar}}" mode="aspectFit" />
+        <text class="nickname">{{doc.post.nickname}}</text>
+      </view>
+
+      <view class="doc created_at">
+        {{doc.post.created_at}}
+      </view>
+
+      <view class="doc zan-row doc_mark">
+        <view class="zan-col zan-col-8" style="{{helpbarstyle}}" @tap="pageScrollTo('viewlogs_a')"> <view class="zan-icon zan-icon-contact"></view> 已阅 * {{doc.post.viewtimes}} </view>
+        <view class="zan-col zan-col-8" style="{{helpbarstyle}}" @tap="pageScrollTo('replys_a')" wx:if="{{doc.post.allowReply==1}}"> <view class="zan-icon zan-icon-chat"></view> 回复 * {{doc.post.replytimes}} </view>
+        <view class="zan-col zan-col-8" style="{{helpbarstyle}}" @tap="pageScrollTo('downloads_a')" wx:if="{{doc.post.filenums>0}}"> <view class="zan-icon zan-icon-tosend"></view> 附件 * {{doc.post.filenums}} </view>
+        <view class="zan-col zan-col-8 shardiv" style="{{helpbarstyle}}">
+          <button class="sharebtn" open-type="share">转发分享</button>
+          <view class="zan-icon zan-icon-exchange-record" style="color:green;"></view> <text style="color:green;margin-left:4px;">转发分享</text>
+        </view>
+      </view>
+
+      <view style="padding: 10px 0;">
+
+        <view class="doc doc_content" wx:if="{{doc.post.content}}">
+          <text space="true" decode="true" selectable="true">{{doc.post.content}}</text>
+          <!-- <template is="wxParse" data="{{wxParseData:detailInfo.nodes}}"></template> -->
+        </view>
+
+        <view class="doc doc_imgs" wx:if="{{doc.post.imgslist.length>0}}">
+          <repeat for="{{doc.post.imgslist}}" key="index" index="index" item="item">
+            <image @tap="clickImageAll" src="{{item.path}}" style="width:100%;" mode="widthFix" data-index="{{index}}" />
+          </repeat>
+        </view>
+
+      </view>
+
+      <view>
+        <view class="doc doc_files" wx:if="{{doc.post.fileslist.length>0}}" id="downloads_a">
+          <view class="zan-cell filecell active_title">
+            <view class="zan-cell__bd filename" style="color: #a3c83a;">
+              <view class="zan-icon zan-icon-tosend"></view> 附件下载
+            </view>
+            <view class="zan-cell__ft filedown"></view>
+          </view>
+          <repeat for="{{doc.post.fileslist}}" key="index" index="index" item="item">
+            <view class="zan-cell filecell" @tap="openFile" @longtap="openlongtap" data-src="{{item.path}}" data-index="{{index}}" data-id="{{item.id}}" data-wxtype="{{item.wxtype}}">
+              <view class="zan-cell__bd filename">{{item.filename}}</view>
+
+              <view wx:if="{{item.wxtype=='opendoc'}}" class="zan-cell__ft filedown">
+                <view class="zan-icon zan-icon-tosend"></view> {{item.showtext}}
+              </view>
+              <view wx:if="{{item.wxtype=='img'}}" class="zan-cell__ft filedown">
+                <view class="zan-icon zan-icon-photo"></view> {{item.showtext}}
+              </view>
+              <view wx:if="{{item.wxtype=='down'}}" class="zan-cell__ft filedown">
+                <view class="zan-icon zan-icon-add"></view> {{item.showtext}}
+              </view>
+
+            </view>
+          </repeat>
+        </view>
+      <view class="show_web_version" wx:if="{{show_web_version&&(doc.post.fileslist.length>0)}}">{{show_web_version}}</view>
+      </view>
+
+      <view class="doc sign_up_div" wx:if="{{doc.post.can_sign_up==1}}">
+        <view class="zan-cell a sign_a" @tap="toggleSinUpDiv">{{doc.post.user_is_sign==1?'已经报名':'立即报名'}}</view>
+        <view class="zan-cell sign_form" wx:if="{{showSignUpDiv}}">
+          <form bindsubmit="signSubmit" report-submit="true">
+            <repeat for="{{doc.post.sign_options}}" key="index" index="index" item="item">
+              <view class="sign_form_cell">
+                <view class="sign_title">{{item.t}}:</view>
+                <view class="sign_content">
+                  <input class="zan-field__input zan-cell__bd sign_value" name="sign_values_{{index}}" placeholder="" placeholder-class="zan-field__placeholder" type="text" value="{{item.v}}" />
+                </view>
+              </view>
+            </repeat>
+            <view style="margin-top:10px;">
+              <button class="zan-btn zan-btn--primary" form-type="submit">提交报名</button>
+              <button class="zan-btn" @tap="deleteSign" wx:if="{{doc.post.user_is_sign==1}}">删除报名</button>
+            </view>
+          </form>
+        </view>
+      </view>
+
+      <view class="doc doc_bars">
+        <view class="zan-cell filecell post_bar">
+          <view class="post_bars viewtimes" style="{{showViewlogs?'color: #a3c83a;border-bottom: 2px solid #a3c83a;':''}}" @tap="switchshow('viewlogs_a')" id="viewlogs_a">
+            <view class="zan-icon zan-icon-contact"></view> 已阅用户 * {{doc.post.viewtimes}}
+          </view>
+          <view class="post_bars replytimes" style="{{showRelpys?'color: #a3c83a;border-bottom: 2px solid #a3c83a;':''}}" wx:if="{{doc.post.allowReply==1}}" @tap="switchshow('replys_a')" id="replys_a">
+            <view class="zan-icon zan-icon-chat"></view> 回复 * {{doc.post.replytimes}}
+          </view>
+        </view>
+
+        <view wx:if="{{showViewlogs}}">
+          <repeat for="{{doc.viewlogs.items}}" key="index" index="index" item="item">
+
+            <view class="zan-cell filecell">
+              <view class="zan-cell__bd viewlogs_user">
+                  <view>
+                    <image src="{{item.avatar}}" class="smallavatar" mode="widthFix" />
+                    {{item.nickname}} 
+                  </view>
+                  <view wx:if="{{item.gid}}" class="groupname">
+                    @<open-data type="groupName" open-gid="{{item.gid}}"></open-data>
+                  </view>
+              </view>
+              <view class="zan-cell__ft viewlogs_time">{{item.updated_at}}</view>
+            </view>
+
+          </repeat>
+
+          <view class="zan-cell filecell act-help" @tap="getmoreViewlog">{{moreViewLog}}</view>
+
+        </view>
+
+        <view wx:if="{{showRelpys && (doc.post.allowReply==1)}}">
+          <form bindsubmit="replySubmit" report-submit="true">
+            <view class="zan-panel">
+              <view style="position:relative;width:100%;">
+                <textarea style="width:96%;border:1px solid #cccccc;height:60px;padding:2px;margin:0 auto 2px;" value="{{addReplyContent}}" maxlength="-1" name="replycontent" class="tzs_textarea zan-field__input zan-cell__bd" placeholder="回复内容"/>
+              </view>
+              <view>
+                <button class="zan-btn zan-btn--primary button-hover" form-type="submit">发表回复</button>
+              </view>
+            </view>
+          </form>
+          <repeat for="{{doc.replys.items}}" key="index" index="index" item="item">
+            <view class="zan-cell filecell reply_title">
+              <view class="zan-cell__bd viewlogs_user">
+                  <view>
+                    <image src="{{item.avatar}}" class="smallavatar" mode="widthFix" />
+                    {{item.nickname}} 
+                  </view>
+              </view>
+              <view class="zan-cell__ft viewlogs_time">{{item.created_at}}</view>
+            </view>
+            <view class=" filecell reply_content">
+              <text space="true" decode="true" selectable="true">{{item.content}}</text>
+            </view>
+            <view class=" filecell reply_delete" wx:if="{{item.candelete==1||item.cansettop==1}}">
+              <view class="reply_opt_a" @tap="setTop" data-opt="0" data-id="{{item.id}}" data-index="{{index}}" wx:if="{{(item.sort>0)&&(item.cansettop==1)}}">取消置顶</view>
+              <view class="reply_opt_a" @tap="setTop" data-opt="1" data-id="{{item.id}}" data-index="{{index}}" wx:if="{{(index>0)&&(item.cansettop==1)}}">置顶部</view>
+              <view class="reply_opt_a" @tap="deleteReply" data-id="{{item.id}}" data-index="{{index}}">删除</view>
+            </view>
+          </repeat>
+
+          <view class="zan-cell filecell act-help" @tap="getmoreReplys">{{moreReplys}}</view>
+
+        </view>
+        
+      </view>
+
+
+    </view>
+
+    <zanLoadmore1 :loading.sync="showLoadMore" > </zanLoadmore1>
+    <view style="height:50px;"></view>
+
+    <view wx:if="{{!showLoadMore}}">
+    <view wx:if="{{!doc.post}}">
+      <zanLoadmore2 :nodata.sync="showEmptyData" nodata_str="没有找到文档"></zanLoadmore2>
+    </view>
+    </view>
+  </view>
+
+  <zanToast></zanToast>
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+import tip from '../libs/tip'
+import zanLoadmore from '../components/zan-loadmore'
+import zanToast from '../components/zan-toast'
+import WxParse from '../libs/wxParse/wxParse'
+
+export default class pagesd extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '文档'
+  }
+  components = {
+    zanLoadmore1: zanLoadmore,
+    zanLoadmore2: zanLoadmore,
+    zanToast:zanToast
+  }
+  data = {
+
+    introrealname:'',
+
+    userInfoAuthed : true,
+    realnameSeted : true,
+    id:'',
+
+    show_web_version:'',
+
+    moreViewLog:'更多阅读记录',
+    moreReplys:'更多回复记录',
+
+    doc:{},
+    inited:false,
+    helpbarstyle:'width:33%;',
+
+    detailInfo:{},
+
+    shownDownLoadHelp:false,
+
+    showLoadMore:true,
+    showEmptyData:true,
+
+    showSignUpDiv:false,
+
+    showRelpys:false,
+    showViewlogs:true,
+    addReplyContent:'',
+
+    preventRepeatReuqest: false,
+
+    currentPageReply:1,
+    currentPage: 1,
+    page_totalReply:0,
+    page_total: 0
+  }
+
+
+  methods = {
+    toggleSinUpDiv(){
+      this.showSignUpDiv = !this.showSignUpDiv
+    },
+    setTop(e){
+      let that = this
+      var id = e.currentTarget.dataset.id
+      var ind = e.currentTarget.dataset.index
+      var opt = e.currentTarget.dataset.opt
+
+      tip.confirm('是否'+(parseInt(opt)==0?'取消':'')+'置顶?').then(r=>{
+      console.log(id,ind)
+      wepy.$instance.getSession().then(r=>{
+        api.topReply({query:{id:id,pid:that.id,title:opt}}).then(res=>{
+            if(res && res.data && res.data.status==1){
+              if( parseInt(opt)==1 ){
+                var pop = that.doc.replys.items[ind]
+                pop.sort=1
+                that.doc.replys.items.splice(ind,1)
+                that.doc.replys.items.unshift(pop)
+                that.$apply()
+              } else {
+                that.getReplys(1)
+              }
+            }
+        })
+      })
+      },r=>{})
+
+    },
+    deleteReply(e){
+      let that = this
+      var id = e.currentTarget.dataset.id
+      var ind = e.currentTarget.dataset.index
+      tip.confirm('是否删除该回复?').then(r=>{
+      console.log(id,ind)
+      wepy.$instance.getSession().then(r=>{
+        api.deleteReply({query:{id:id}}).then(res=>{
+            if(res && res.data && res.data.status==1){
+              that.doc.replys.items.splice(ind,1)
+              that.$apply()
+              if( that.doc.replys.items.length<3 ){
+                that.getReplys(1)
+              }
+            }
+        })
+      })
+      },r=>{})
+    },
+    switchshow(s){
+      this.showswitch(s)
+    },
+    pageScrollTo(id){
+        console.log('pageScrollTo',id)
+        var aid = '#'+id
+        var query = wx.createSelectorQuery()
+        query.select(aid).boundingClientRect()
+        query.selectViewport().scrollOffset()
+        query.exec(function(res){
+          console.log('pageScrollTo',res)
+          wx.pageScrollTo({
+            scrollTop: res[0].top,
+            duration: 300
+          })
+        })
+        this.showswitch(id)
+    },
+    wxParseImgLoad(){},
+    wxParseImgTap(e){
+      this.needreloadonshow = false
+      var nowImgUrl = e.target.dataset.src
+      if ( this.detailInfo != 'undefined' && this.detailInfo.imageUrls.length > 0) {
+        wx.previewImage({
+          current: nowImgUrl, // 当前显示图片的http链接
+          urls: this.detailInfo.imageUrls // 需要预览的图片http链接列表
+        })
+      }
+    },
+    openlongtap(e){
+      let that = this
+      var index = e.currentTarget.dataset.index
+      var fobj = this.doc.post.fileslist[index]
+      console.log('openlongtap', fobj)
+    },
+    openFile(e){
+      let that = this
+      var index = e.currentTarget.dataset.index
+      var id = e.currentTarget.dataset.id
+      var src = e.currentTarget.dataset.src
+      var wxtype = e.currentTarget.dataset.wxtype
+
+      //var downloadlink = api.downloadfile() + '&id='+id+'&from=clipboard'
+      var downloadlink = api.docdwebpage() + '&pid='+that.id+'&from=clipboard'
+      
+    if(wxtype=='img'){
+       wepy.previewImage({
+           urls: [src]
+         })
+     } else {
+
+      if( wxtype=='down' || that.doc.post.fileslist[index].islink == 1 ){
+        wepy.setClipboardData({data:downloadlink})
+        that.$invoke('zanToast', 'showZanToast', { title: '已复制下载地址,请通过浏览器进行下载!', timeout: 3000 })
+        return
+      }
+
+      if( wxtype=='opendoc' ){
+            //判断保存文件
+            var filepath = wepy.$instance.getSavedFileByFileid(id)
+            if( filepath == undefined ){
+              if( that.doc.post.fileslist[index].downloading==1 ){
+                return
+              }
+              that.doc.post.fileslist[index].downloading = 1
+              const downloadTask = wx.downloadFile({
+                url: src,
+                success: function (res) {
+                  console.log('downloadFile',res)
+                  if (res.statusCode === 200) {
+                      wx.saveFile({
+                        tempFilePath: res.tempFilePath,
+                        success: function(sres) {
+                          filepath = sres.savedFilePath
+                          wepy.$instance.setSavedFile(id,filepath)
+                          that.doc.post.fileslist[index].localpath = filepath
+                          that.$apply()
+                        }
+                      })
+                  }
+                }
+              })
+              downloadTask.onProgressUpdate((res) => {
+                  console.log('下载进度', res.progress)
+                  that.doc.post.fileslist[index].showtext = res.progress + '%'
+                  if( res.progress == 100 ){
+                    delete that.doc.post.fileslist[index].downloading
+                    that.doc.post.fileslist[index].showtext = that.doc.post.fileslist[index].showtextEnd
+                  }
+                  that.$apply()
+              })
+            }
+            console.log('opendoc filepath :',filepath)
+            //打开文件
+            if( filepath ){
+              if(wxtype=='opendoc'){
+                  wx.openDocument({
+                    filePath: filepath,
+                    success: function (res) {
+                      //console.log('打开文档成功',res)
+                    },
+                    fail: function (res) {
+                      console.log('打开文档失败',res)
+                      wepy.setClipboardData({data:downloadlink})
+                      that.doc.post.fileslist[index].showtext = '复制下载地址'
+                      that.shownDownLoadHelp = true
+                      that.$invoke('zanToast', 'showZanToast', { title: '打开文档失败! 已复制下载地址,请通过浏览器进行下载!', timeout: 6000 })
+                      that.$apply()
+                      return
+                    }
+                  })
+              }
+            }
+      }
+
+     }
+    },
+    bindgetuserinfo(e){
+      if( e.detail.userInfo!=undefined && e.detail.userInfo.nickName!=undefined ) {
+        this.uploadUserInfo(e.detail)
+      }
+    },
+    clickImageAll(e) {
+      var index = e.currentTarget.dataset.index
+      var current,allpics=[]
+      for (var i = 0; i < this.doc.post.imgslist.length; i++) {
+        if( i==index ) {
+          current = this.doc.post.imgslist[i].path
+        }
+        allpics.push(this.doc.post.imgslist[i].path)
+      }
+      wepy.previewImage({
+        current:current,
+        urls: allpics
+      })
+    },
+    getmoreViewlog(e){
+      this.onReachBottom()
+    },
+    getmoreReplys(e){
+      this.onReachBottom()
+    },
+    onShareAppMessage: function (res) {
+      let that = this
+      wx.showShareMenu({
+        withShareTicket: true
+      })
+      return {
+        title: this.doc.post.title || '有一个新文档',
+        path: '/pages/d?id=' + this.id,
+        success:function(res) {
+          console.log('onShareAppMessage success',res)
+
+          wx.getShareInfo({
+            shareTicket: res.shareTickets[0],
+            success(resg) {
+              // 后台解密，获取 openGId
+                wepy.$instance.getSession().then(r=>{
+                    api.shareInfo({query:{shareTicket: res.shareTickets[0],encryptedData:resg.encryptedData,iv:resg.iv,pid:that.id,path:'/pages/d',fullpath:'/pages/d?id='+that.id}})
+                })
+            }
+          })
+        },
+        complete:function(res) {
+          console.log('onShareAppMessage complete',res)
+        }
+
+      }
+    },
+    formSubmit(e){
+      let that = this
+      console.log(e)
+      if( e.detail.value.realname==undefined || e.detail.value.realname=='' ){
+        return
+      }
+      api.updateUserInfo({query:{realname:e.detail.value.realname,formId:e.detail.formId,meconfig:1}}).then(res=>{
+          if( res.data && res.data.status==1 && res.data.realname!=undefined ){
+            wepy.$instance.globalData.userkey.realname = res.data.realname
+            wepy.$instance.globalData.userkey.realname_seted = 1
+            wepy.setStorageSync('USER_KEY_INFO', wepy.$instance.globalData.userkey)
+            that.realnameSeted = true
+            that.$apply()
+          }
+      })
+    },
+    signSubmit(e){
+      let that = this
+      let values = e.detail.value
+        wepy.$instance.getSession().then(r=>{
+          api.signUp({query:{values:values,pid:that.id,formId:e.detail.formId},method:'POST'}).then(res=>{
+            if(res.data.status==1){
+              that.showSignUpDiv = false
+              that.doc.post.sign_options = res.data.sign_options
+              that.doc.post.user_is_sign = res.data.user_is_sign
+              that.$invoke('zanToast', 'showZanToast', { title: '成功提交报名!', timeout: 2000 })
+              that.$apply()
+            }
+          })
+        })
+    },
+    deleteSign(e){
+      let that = this
+        wepy.$instance.getSession().then(r=>{
+          api.deleteSign({query:{pid:that.id}}).then(res=>{
+            console.log(res)
+            if(res.data.status==1){
+              that.showSignUpDiv = false
+              that.doc.post.sign_options = res.data.sign_options
+              that.doc.post.user_is_sign = res.data.user_is_sign
+              that.$invoke('zanToast', 'showZanToast', { title: '成功删除了报名记录!', timeout: 2000 })
+              that.$apply()
+            }
+          })
+        })
+    },
+    replySubmit(e){
+      let that = this
+      let content = e.detail.value.replycontent
+      if(content!=undefined && content!='' && content!=' '){
+        wepy.$instance.getSession().then(r=>{
+          api.addReply({query:{content:content,pid:that.id,formId:e.detail.formId}}).then(res=>{
+            console.log(res)
+            if(res.data.status==1){
+              that.doc.replys = res.data.replys
+              that.addReplyContent = ' '
+              that.$apply()
+              that.addReplyContent = ''
+              that.$apply()
+              that.$invoke('zanToast', 'showZanToast', { title: '成功发表回复!', timeout: 2000 })
+            }
+          })
+        })
+      }
+    }
+  }
+
+  onShow () {
+    this.introrealname = wepy.$instance.globalData.userkey.introrealname
+    this.show_web_version = wepy.$instance.globalData.userkey.show_web_version
+  }
+
+
+  showswitch(s){
+    if( s=='viewlogs_a' ){
+      this.showViewlogs=true
+      this.showRelpys=false
+    } else if(s=='replys_a'){
+      this.showViewlogs=false
+      this.showRelpys=true
+    }
+  }
+
+  async uploadUserInfo(detail) {
+    let that = this
+    wepy.$instance.updateUserInfo(detail).then(resp=>{
+        var rlt = resp.data
+        if( rlt.reguid!=undefined && parseInt(rlt.reguid)>0 ){
+          that.userInfoAuthed = true
+          that.$apply()
+          that.showDoc()
+        }
+    })
+  }
+
+  showDoc(){
+    let that = this
+
+    that.showLoadMore = true
+    //必须是授权后才能读取数据...
+
+    if( wepy.$instance.globalData.userkey.realname_seted==undefined || parseInt(wepy.$instance.globalData.userkey.realname_seted)!=1 ){
+      this.realnameSeted = false
+      this.$apply()
+    }
+
+    wepy.$instance.getSession().then(r=>{
+
+        // wx.getShareInfo({
+        //   shareTicket: wepy.$instance.globalData.lunchOptions.shareTicket || '',
+        //   success(r){},
+        //   fail(r){},
+        //   complete(resg) {
+          wepy.getShareInfo({shareTicket: wepy.$instance.globalData.lunchOptions.shareTicket || ''}).then(r=>{that.getDoc(r)},r=>{that.getDoc(r)})
+        //   }
+        // })
+
+    })
+  }
+
+  getDoc(resg){
+    let that = this    
+      console.log('resgresgresgresg',resg)
+      // 后台解密，获取 openGId
+      var lunchPid = 0
+      if( wepy.$instance.globalData.lunchOptions.query != undefined ){
+        lunchPid = wepy.$instance.globalData.lunchOptions.query.id
+      }
+        api.getOneDoc({query:{pid:that.id,shareTicket:wepy.$instance.globalData.lunchOptions.shareTicket||'',lunchPid:lunchPid,encryptedData:resg.encryptedData||'',iv:resg.iv||''}}).then(res=>{
+          console.log('resresres:::',res)
+
+          if( res.data && res.data.status==1 ){
+            that.doc = res.data
+            that.showLoadMore = false
+            that.doc.post.fileslist = that.checkFiles(that.doc.post.fileslist)
+            that.page_total = res.data.viewlogs.totalPage
+            that.page_totalReply = res.data.replys.totalPage
+
+            if( !that.inited && that.doc.post.allowReply==1 ){
+              that.showRelpys = true
+              that.showViewlogs = false
+            }
+            that.inited = true
+
+            
+            var helpbars = 2
+            if( parseInt(that.doc.post.allowReply)==1 ){
+              helpbars++
+              console.log('zzzzzzz1',helpbars)
+            }
+            if( parseInt(that.doc.post.filenums)>0 ){
+              helpbars++
+              console.log('zzzzzzz2',helpbars)
+            }
+            that.helpbarstyle = 'width:'+99/helpbars+'%;'
+
+            // let parseHtml = WxParse.wxParse('detailInfo', 'html', that.doc.post.content, that,0)
+            // that.detailInfo = parseHtml.detailInfo
+
+            that.$apply()
+          }
+          console.log('showDoc',that.doc)
+        })
+  }
+
+  checkFiles(flist){
+    if( flist!=undefined && flist.length>0 ){
+          for (var i = 0; i < flist.length; i++) {
+            if( flist[i].wxtype=='img' ){
+              flist[i].showtext = '图片'
+            } else {
+
+              if( flist[i].wxtype=='opendoc' ){
+                flist[i].showtext = '打开'
+                var fpath = wepy.$instance.getSavedFileByFileid(flist[i].id)
+                if( fpath==undefined ){
+                  flist[i].showtextEnd = flist[i].showtext
+                  flist[i].showtext = '下载'
+                }
+              } else {
+                this.shownDownLoadHelp = true
+                flist[i].showtext = '复制下载地址'
+              }
+
+            }
+       }
+     }
+     return flist
+  }
+
+  onLoad(option) {
+    option = this.scene_explode(option)
+    let that = this
+    that.id = option.id || 0
+
+    if( option.fromi && (parseInt(option.fromi) == 1) ){
+      wepy.setStorageSync('TEMP_DOC_SET','view')
+    }
+  }
+
+  onPullDownRefresh() {
+    if(this.userInfoAuthed){
+      this.showLoadMore = true
+      this.showDoc()
+    }
+  }
+
+  onReachBottom() {
+    let that = this
+    that.showLoadMore = false
+    //判断总页数是否大于翻页数
+    if( that.showViewlogs ) {
+      if ( that.page_total > that.currentPage ) {
+        //防止重复加载
+        that.showLoadMore = true
+        if (that.preventRepeatReuqest) {
+          return true
+        }
+        that.preventRepeatReuqest = true
+        that.currentPage++
+        that.getViewLogs(that.currentPage)
+        that.preventRepeatReuqest = false
+      } else {
+        that.moreViewLog = '没有更多了!'
+      }
+    } else if ( that.showRelpys ) {
+      if ( that.page_totalReply > that.currentPageReply ) {
+        //防止重复加载
+        that.showLoadMore = true
+        if (that.preventRepeatReuqest) {
+          return true
+        }
+        that.preventRepeatReuqest = true
+        that.currentPageReply++
+        that.getReplys(that.currentPageReply)
+        that.preventRepeatReuqest = false
+      } else {
+        that.moreReplys = '没有更多了!!'
+      }
+    }
+  }
+
+  getViewLogs(currentPage){
+    let that = this
+    wepy.$instance.getSession().then(r=>{
+      api.viewlogs({query:{pid:that.id,page:currentPage}}).then(res=>{
+
+        if(currentPage==1) {
+          that.doc.viewlogs = []
+        }
+        that.currentPage = res.data.viewlogs.currentPage
+        if(res.data.viewlogs){
+          that.doc.viewlogs.items.push(...res.data.viewlogs.items)
+        }
+        if( that.doc.viewlogs.items.length>0 ){
+          that.page_total = res.data.viewlogs.totalPage
+        }
+        if( that.page_total <= currentPage ){
+          that.moreViewLog = '没有更多了'
+        }
+
+        that.showLoadMore = false
+        that.$apply()
+      })
+    })
+  }
+
+  getReplys(currentPage){
+    let that = this
+    wepy.$instance.getSession().then(r=>{
+      api.replys({query:{pid:that.id,page:currentPage}}).then(res=>{
+
+        if(currentPage==1) {
+          that.doc.replys.items = []
+        }
+        if(res.data.replys){
+          that.doc.replys.items.push(...res.data.replys.items)
+        }
+        if( that.doc.replys.items.length>0 ){
+          that.page_totalReply = res.data.replys.totalPage
+        }
+        if( that.page_totalReply <= currentPage ){
+          that.moreReplys = '没有更多了'
+        }
+
+        that.showLoadMore = false
+        that.$apply()
+      })
+    })
+  }
+
+  onLoadM(data){
+    if( wepy.$instance.globalData.userkey.userAuthed ) {
+      this.userInfoAuthed = true
+
+      this.showDoc()
+    } else {
+      this.userInfoAuthed = false
+    }
+    this.$apply()
+  }
+}
+</script>

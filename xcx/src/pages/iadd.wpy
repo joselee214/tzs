@@ -1,0 +1,550 @@
+<style lang='css'>
+@import '/zanui/panel.wxss';
+@import '/zanui/btn.wxss';
+@import '/zanui/cell.wxss';
+@import '/zanui/icon.wxss';
+@import '/zanui/card.wxss';
+@import '/zanui/color.wxss';
+
+
+.tzs_intro{
+  margin: 10px 40px 10px;
+  padding: 15px;
+  background: #ffffff;
+  color: #999999;
+  font-size: 14px;
+  text-align: center;
+  border: 1px dashed #cccccc;
+}
+.zan-loadmore--nodata{
+  margin: 120px auto;
+}
+.zan-panel {
+  margin-top:0;
+}
+.postForm{
+  padding-top: 5px;
+}
+.zan-icon {
+  font-size: 18px;
+}
+.title_icon{
+  margin: 0 2px 0 20px;
+  font-size: 14px;
+}
+.title_posts_num{
+  font-size: 14px;
+  color: #777;
+}
+.newUploadText{
+  margin-left:10px;
+  color: #888888;
+  font-size: 18px;
+}
+
+.zan-card{
+  padding: 15px 20px;
+}
+.zan-card__left-col{
+  margin-right: 0px;
+}
+.zan-card__thumb{
+  width: 72px;
+}
+.zan-card__detail{
+  margin-left: 85px;
+  margin-right: 25px;
+}
+.zan-card__right-col{
+  margin-top:40px;
+}
+.doc_mark_row .zan-icon{
+  font-size: 14px;
+}
+.doc_mark{
+  margin:0 36px 0 4px;
+}
+
+
+.doc_admin_row{
+  margin-top: 8px;
+  opacity:0.5;
+}
+.doc_admin_row .zan-icon{
+  font-size: 12px;
+}
+.doc_admin_row .zan-btn{
+  margin-right: 20px;
+}
+.tzs_textarea{
+  min-height: 30px;
+}
+
+.imgsfiles_img_cell{
+  display: block;
+  text-align:center;
+  padding-bottom:0;
+  padding-top: 5px;
+  padding-right: 25px;
+}
+.imgsfiles_img_item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed #cccccc;
+  padding: 5px 0 5px 0;
+}
+.imgsfiles_file_item{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px dashed #cccccc;
+  padding: 5px 0 5px 0;
+}
+.imgsfiles_img{
+  height: 40px;
+  width: 72px;
+  margin: 4px 10px;
+  display: inline-block;
+}
+.imgsfiles_file_name{
+  margin-right: 50px;
+  overflow: hidden;
+}
+.uploadnote{
+  font-size: 9px;
+  margin-top: 3px;
+  text-align: center;
+}
+.sign_options{
+  height: 100px;
+  margin: 0 20px;
+  padding: 2px;
+  background: #f3f3f3;
+}
+</style>
+<template>
+<view class="container">
+
+  <zanLoadmore1 :loading.sync="showLoadMore" > </zanLoadmore1>
+
+  <form bindsubmit="formSubmit" report-submit="true">
+    <view class="zan-panel postForm">
+      <view class="zan-cell zan-field">
+        <input class="zan-field__input zan-cell__bd" name="title" placeholder="标题" placeholder-class="zan-field__placeholder" type="text" value="{{editpost.title}}" />
+      </view>
+      <view class="zan-cell zan-field">
+        <textarea value="{{editpost.content}}" maxlength="-1" name="content" class="tzs_textarea zan-field__input zan-cell__bd" placeholder="文字内容"/>
+      </view>
+      <view class="zan-cell zan-field zan-pull-center imgsfiles_img_cell" wx:if="{{(imgsfiles.length+editfiles.length+serverfiles.length)>0}}">
+
+        <repeat for="{{imgsfiles}}" item="item" key="ind" index="ind">
+          <view class="imgsfiles_img_item"  @tap="clickImageAll" data-index="{{ind}}">
+            <image class="imgsfiles_img" src="{{item.path}}" mode="aspectFit" />
+            <view>
+              <view wx:if="{{ind>0}}" class="zan-icon zan-icon-upgrade" @tap.stop="upfirstImg" style="color: red;margin-right:30px;" data-index="{{ind}}"></view>
+              <view class="zan-icon zan-icon-close" style="color: red;" @tap.stop="deleteImgs" data-index="{{ind}}"></view>
+            </view>
+          </view>
+        </repeat>
+
+        <repeat for="{{editfiles}}" item="item" key="ind" index="ind">
+          <view class="imgsfiles_file_item" data-index="{{ind}}">
+            <view class="imgsfiles_file_name">{{item.filename}}</view>
+            <view class="zan-icon zan-icon-close" style="color: blue;" @tap.stop="deleteOriginUpload" data-index="{{ind}}" data-id="{{item.id}}"></view>
+          </view>
+        </repeat>
+
+        <repeat for="{{serverfiles}}" item="item" key="ind" index="ind">
+          <view class="imgsfiles_file_item" data-index="{{ind}}">
+            <view class="imgsfiles_file_name">{{item.filename}}</view>
+            <view class="zan-icon zan-icon-close" style="color: blue;" @tap.stop="deleteServerUpload" data-index="{{ind}}" data-id="{{item.id}}"></view>
+          </view>
+        </repeat>
+
+      </view>
+      <view class="zan-cell zan-field zan-pull-center" style="justify-content:space-around;">
+        <view @tap="gotoUpload" wx:if="{{showServerfile}}">
+          <view style="display:flex;justify-content:center;">
+            <view class="zan-icon zan-icon-add2"  style="color: blue;"></view>
+            <text class="newUploadText">添加附件</text>
+          </view>
+          <view class="uploadnote">作为附件下载</view>
+        </view>
+        <view @tap="chooseImgs">
+          <view style="display:flex;justify-content:center;">
+            <view class="zan-icon zan-icon-add2"  style="color: #4b0;"></view>
+            <text class="newUploadText">上传图片</text>
+          </view>
+          <view class="uploadnote">{{showuploadtext}}</view>
+        </view>
+      </view>
+
+    </view>
+    <view class="zan-panel">
+        <view class="zan-cell zan-cell--switch">
+          <view class="zan-cell__bd">允许回复</view>
+          <view class="zan-cell__ft">
+            <zanSwitch :checked.sync="allowReply" componentId="zanSwitch"> </zanSwitch>
+          </view>
+        </view>
+
+        <view class="zan-cell zan-cell--switch" wx:if="{{canSetSignUp}}">
+          <view class="zan-cell__bd">启用报名</view>
+          <view class="zan-cell__ft">
+            <zanSwitch1 :checked.sync="canSignUp" componentId="zanSwitch1"> </zanSwitch1>
+          </view>
+        </view>
+
+        <view class="zan-cell zan-field" wx:if="{{canSetSignUp&&canSignUp}}">
+            <textarea value="{{editpost.sign_up_options}}" maxlength="-1" name="sign_up_options" class="tzs_textarea zan-field__input zan-cell__bd sign_options" placeholder="这里填写报名项,每一行为一个报名项,用于简单表格收集;不支持空行,发布后请仔细检查后再转发分享!"/>
+        </view>
+    
+    </view>
+    <view class="zan-panel">
+
+      <view class="zan-btns">
+        <button class="zan-btn zan-btn--primary button-hover" form-type="submit">提交发布</button>
+        <button class="zan-btn" @tap="cancelPost">取消</button>
+      </view>
+    </view>
+  </form>
+
+  <view class="show_web_version zan-c-red" wx:if="{{show_web_version}}">可通过WEB版上传其它类型附件</view>
+  <view class="show_web_version" wx:if="{{show_web_version}}">{{show_web_version}}</view>
+
+  <view class="tzs_intro">
+    {{intro}}
+  </view>
+
+  <view style="height:200px;"></view>
+
+</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import libsBasic from '../libs/basic'
+import api from '../libs/api'
+import tip from '../libs/tip'
+import zanLoadmore from '../components/zan-loadmore'
+import zanSwitch from '../components/zan-switch'
+
+export default class pagesiadd extends wepy.page {
+  mixins = [libsBasic]
+  config = {
+    navigationBarTitleText: '我的文档'
+  }
+  components = {
+    zanLoadmore1: zanLoadmore,
+    zanSwitch:zanSwitch,
+    zanSwitch1:zanSwitch
+  }
+  data = {
+    intro:'',
+
+    id:'',
+
+    getUploadsOnshow:false,
+    show_web_version:'',
+
+    uploadTask:'',
+    uploadedNum:0,
+    imgsfileswait:[],
+    showuploadtext:'图片直接显示',
+    submitData:{},
+    editpost:{},
+
+    allowReply:false,
+    canSetSignUp:false,
+    canSignUp:false,
+
+    showServerfile:true,  //可附件
+
+    imgsfiles:[],
+    editfiles:[],
+    serverfiles:[],
+    showLoadMore:false
+  }
+  events = {
+    zanSwitchChange(event) {
+      let { checked,componentId } = event.source
+      console.log(checked,componentId)
+
+      if( componentId =='zanSwitch1' ){
+        this.canSignUp = !checked
+      } else {
+        this.allowReply = !checked
+      }
+      this.$apply()
+    }
+  }
+  methods = {
+    clickImageAll(e) {
+      var index = e.currentTarget.dataset.index
+      var current,allpics=[]
+      for (var i = 0; i < this.imgsfiles.length; i++) {
+        if( i==index ) {
+          current = this.imgsfiles[i].path
+        }
+        allpics.push(this.imgsfiles[i].path)
+      }
+      wepy.previewImage({
+        current:current,
+        urls: allpics
+      })
+    },
+    gotoUpload(){
+      wepy.$instance.getSession().then(r=>{
+        this.go_url('/pages/uploadwebview','navigate')
+      },r=>{})
+    },
+    cancelPost(){
+      this.go_url('/pages/i','switchTab')
+    },
+    chooseImgs(){
+      let that = this
+      wepy.chooseImage({
+        count: 9, // 默认9
+        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+        sourceType: ['album', 'camera']
+      }).then(res=>{
+        console.log('chooseImgs : ',res)
+        that.imgsfiles.push(...res.tempFiles)
+        that.$apply()
+      },r=>{})
+    },
+    formSubmit(e){
+      var formId = e.detail.formId || ''
+      this.submitForm(e.detail.value,formId)
+    },
+    deleteImgs(e){
+      var ind = e.currentTarget.dataset.index
+      let that = this
+      console.log(ind)
+      that.imgsfiles.splice(ind,1)
+      that.$apply()
+    },
+    upfirstImg(e){
+      var ind = e.currentTarget.dataset.index
+      var upitem = this.imgsfiles[ind]
+      this.imgsfiles.splice(ind,1)
+      this.imgsfiles.unshift(upitem)
+      this.$apply()
+    },
+    deleteOriginUpload(e){
+      var ind = e.currentTarget.dataset.index
+      let that = this
+      that.editfiles.splice(ind,1)
+      that.$apply()
+    },
+    deleteServerUpload(e){
+      var id = e.currentTarget.dataset.id
+      this.deleteTempUpload(id)
+    }
+  }
+
+  editPost(id){
+      let that = this
+      if( parseInt(id)>0 ){
+        wepy.$instance.getSession().then(r=>{
+          that.showLoadMore = true
+          api.getOneDoc({query:{pid:id,edit:1}}).then(res=>{
+              if(res && res.data && res.data.status==1){
+                that.editpost = res.data.post
+                console.log('that.editpost : ',that.editpost)
+
+                that.imgsfiles = that.editpost.imgslist || [] //
+                that.editfiles = that.editpost.fileslist || [] //
+                that.allowReply = parseInt(that.editpost.allowReply)==1?true:false
+                that.canSignUp = parseInt(that.editpost.can_sign_up)==1?true:false
+                that.serverfiles = that.editpost.uploads // []
+                //that.getTempUpload()
+                that.showLoadMore = false
+                that.getUploadsOnshow = true
+                that.$apply()
+              }
+          })
+        },r=>{})
+      } else {
+        that.getUploadsOnshow = true
+      }
+  }
+
+  onShow () {
+//    this.intro = wepy.$instance.globalData.userkey.intro
+    if( this.getUploadsOnshow ){
+      this.getTempUpload()
+    }
+    this.intro = wepy.$instance.globalData.userkey.intro
+    this.canSetSignUp = wepy.$instance.globalData.userkey.can_sign_up==1
+    this.show_web_version = wepy.$instance.globalData.userkey.show_web_version
+  }
+
+
+  getTempUpload(){
+    let that = this
+    if( this.showServerfile ){
+      api.getTempUpload().then(res=>{
+          if(res && res.data && res.data.status==1){
+            that.serverfiles = res.data.uploads
+            that.$apply()
+          }
+      })
+    }
+  }
+
+  deleteTempUpload(id){
+    let that = this
+    api.deleteTempUpload({query:{id:id}}).then(res=>{
+        if(res && res.data && res.data.status==1){
+          that.serverfiles = res.data.uploads
+          that.$apply()
+        }
+    })
+  }
+
+  doUploadfiles(){
+    let that = this
+    //console.log('doUploadfiles::::::::::::::::::that.imgsfileswait',that.imgsfileswait)
+    if( that.imgsfileswait.length>0 )
+    {
+      that.uploadedNum++
+      if( that.imgsfileswait[0].id == undefined ){
+        var tempid = that.uploadedNum-1
+        that.uploadTask = wx.uploadFile({
+            url: api.uploadimgurl()+'&fromtype=1',
+            filePath: that.imgsfileswait[0].path,
+            name: 'file',
+            formData:{
+              fromtype: 1
+            },
+            success: function(res){
+              if( res.data ){
+                var ret = JSON.parse(res.data)
+                console.log('doUploadfiles::::::::::::::::::',ret,that.uploadedNum,tempid)
+                if( ret!=undefined && ret.status==1 && ret.upload!=undefined && ret.upload.id!=undefined ){
+                  that.imgsfiles[tempid].id = ret.upload.id
+                }
+              }
+              that.imgsfileswait.splice(0,1)
+              that.doUploadfiles()
+            }
+        })
+        that.uploadTask.onProgressUpdate((res) => {
+            // console.log('上传进度', res.progress)
+            // console.log('上传NUM', that.uploadedNum)
+            that.showuploadtext = res.progress+'% ... '+that.uploadedNum+'/'+that.imgsfiles.length
+            that.$apply()
+        })
+      } else {
+        that.imgsfileswait.splice(0,1)
+        that.doUploadfiles()
+      }
+    }
+    else
+    {
+      that.showuploadtext = ' 上传完成 ... '+that.uploadedNum+'/'+that.imgsfiles.length
+      that.realSubmitForm(that.submitData)
+    }
+  }
+
+  async realSubmitForm(data,formId){
+      let that = this
+      var upimgs = ''
+      if( that.imgsfiles.length>0 ){
+        var upimgs_ = []
+        for (var i = 0; i < that.imgsfiles.length; i++) {
+          upimgs_.push(that.imgsfiles[i].id)
+        }
+        upimgs = upimgs_.join(',')
+      }
+      var upfiles = ''
+      var upfiles_ = []
+      if( that.serverfiles.length>0 ){
+        for (var i = 0; i < that.serverfiles.length; i++) {
+          upfiles_.push(that.serverfiles[i].id)
+        }
+      }
+      if( that.editfiles.length>0 ){
+        for (var i = 0; i < that.editfiles.length; i++) {
+          upfiles_.push(that.editfiles[i].id)
+        }
+      }
+      if( upfiles_.length>0 ){
+        upfiles = upfiles_.join(',')
+      }
+      wepy.$instance.getSession().then(res=>{
+        api.doPost({
+            query: {
+              title: data.title,
+              formId: formId || data.formId || '',
+              content: data.content,
+              upimgs:upimgs,
+              upfiles:upfiles,
+              pid:that.editpost.id||0,
+              allowReply:that.allowReply?1:0,
+              can_sign_up:that.canSignUp?1:0,
+              sign_up_options:data.sign_up_options
+            },
+            method:'POST'
+          }).then(res=>{
+            if(res && res.data && res.data.status==1){
+
+              //恢复显示!!!
+              that.imgsfiles = []
+              that.editfiles = []
+              that.showuploadtext = '图片直接显示'
+              wepy.setStorageSync('TEMP_SET','add')
+              that.$apply()
+              that.go_url('/pages/i','switchTab')
+            }
+          })
+      })
+  }
+
+  async submitForm(data,formId){
+      let that = this
+      if( this.showLoadMore ){
+        return
+      }
+      if( data.title=='' && data.content=='' && this.imgsfiles.length==0 && this.editfiles.length==0 && this.serverfiles.length==0 ){
+        return
+      }
+
+      if( that.imgsfiles.length>0 )
+      {
+        that.submitData = data
+        that.submitData.formId = formId
+
+        that.imgsfileswait = that.imgsfiles.concat()
+        that.uploadedNum = 0
+        that.doUploadfiles()
+      }
+      else
+      {
+        that.realSubmitForm(data,formId)
+      }
+  }
+
+  onPullDownRefresh() {
+    this.editPost(this.id)
+    this.$apply()
+  }
+
+  onLoad(option) {
+    if( wepy.$instance.globalData.systeminfo.platform == 'ios' ){
+      this.showServerfile = false
+    }
+    option = this.scene_explode(option)
+    let that = this
+    that.id = option.id || 0
+  }
+
+  onLoadM(data){
+    let that = this
+    this.editPost(this.id)
+    this.$apply()
+  }
+}
+</script>
